@@ -48,7 +48,8 @@ const state = {
   memoryInput: 0,
   quizIndex: 0,
   quizA: 0,
-  quizB: 0
+  quizB: 0,
+  tttTieCount: 0
 };
 
 const qs = selector => document.querySelector(selector);
@@ -686,35 +687,47 @@ function breakAlliance(p, message) {
 function wheelScreen(title, labels, pickedIndex, done) {
   const content = render("ΤΡΟΧΟΣ", title);
   const items = labels.map(item => typeof item === "string" ? { label: item } : item);
-  const colors = ["#ffc84a", "#ed2d4e", "#4d85ff", "#a46fff", "#70e6ac", "#ff7a4d"];
-  const card = el("div", "wheel-card");
-  const wheel = el("div", "wheel");
-  wheel.style.background = `conic-gradient(${items.map((_, i) => `${colors[i % colors.length]} ${i * 100 / items.length}% ${(i + 1) * 100 / items.length}%`).join(",")})`;
-  items.forEach((item, i) => {
-    const marker = el("div", "wheel-marker");
-    const angle = (i + 0.5) * (360 / items.length);
-    marker.style.setProperty("--angle", `${angle}deg`);
-    marker.innerHTML = `<span>${item.img ? `<img src="${item.img}" alt="">` : ""}<b>${item.label}</b></span>`;
-    wheel.append(marker);
-  });
-  wheel.append(el("div", "wheel-hub", "SPIRITS"));
-  const result = el("div", "wheel-name", "Έτοιμο");
-  card.append(el("div", "pointer"), wheel, result);
+  const card = el("div", "slot-card");
+  const windowNode = el("div", "slot-window");
+  const reel = el("div", "slot-reel");
+  const repeated = [];
+  for (let i = 0; i < 14; i++) repeated.push(...items);
+  repeated.forEach(item => reel.append(slotItem(item)));
+  windowNode.append(reel, el("div", "slot-selector", "ΕΠΙΛΟΓΗ"));
+  const result = el("div", "slot-result", "Έτοιμο");
+  card.append(windowNode, result);
   content.append(card);
   content.append(actions(button("Γύρνα", "", e => {
     e.currentTarget.disabled = true;
     playMusic("./audio/spin.mp3", { volume: 0.88 });
     result.textContent = "Γυρίζει...";
     result.classList.remove("winner-flash");
-    const sector = 360 / labels.length;
-    wheel.style.transform = `rotate(${2160 + (360 - pickedIndex * sector - sector / 2)}deg)`;
+    reel.style.transition = "none";
+    reel.style.transform = "translateY(0px)";
+    reel.offsetHeight;
+    const itemHeight = 74;
+    const loops = 9 + Math.floor(Math.random() * 3);
+    const finalIndex = loops * items.length + pickedIndex;
+    reel.style.transition = "transform 4.2s cubic-bezier(.08,.82,.12,1)";
+    reel.style.transform = `translateY(${-finalIndex * itemHeight}px)`;
     setTimeout(() => {
       stopMusic();
       result.textContent = `Αποτέλεσμα: ${items[pickedIndex].label}`;
       result.classList.add("winner-flash");
+      reel.querySelectorAll(".slot-item").forEach(item => item.classList.toggle("active", item.dataset.label === items[pickedIndex].label));
       content.append(actions(button("Συνέχεια", "secondary", done)));
-    }, 3400);
+    }, 4300);
   })));
+}
+
+function slotItem(item) {
+  const node = el("div", "slot-item");
+  node.dataset.label = item.label;
+  node.innerHTML = `
+    ${item.img ? `<img class="avatar" src="${item.img}" alt="${item.label}">` : `<span class="slot-icon">?</span>`}
+    <strong>${item.label}</strong>
+  `;
+  return node;
 }
 
 function luckWheel() {
@@ -802,14 +815,19 @@ function startMini(game, a, b) {
   else rpsPick(a, b, a, "");
 }
 
-function rpsPick(a, b, picker, first) {
+function rpsPick(a, b, picker, first, tieCount = 0) {
   const content = render("ΠΕΤΡΑ ΨΑΛΙΔΙ ΧΑΡΤΙ", picker.name);
+  if (tieCount) content.append(paragraph(`Ισοπαλίες: ${tieCount} / 6. Στις 6 πάμε σε κορώνα ή γράμματα.`));
   content.append(paragraph(`Δώσε το κινητό στον/στην ${picker.name}. Διάλεξε κρυφά.`));
-  content.append(rpsChoices(move => picker === a ? rpsPick(a, b, b, move) : resolveRps(a, b, first, move)));
+  content.append(rpsChoices(move => picker === a ? rpsPick(a, b, b, move, tieCount) : resolveRps(a, b, first, move, tieCount)));
 }
 
-function resolveRps(a, b, am, bm) {
-  if (am === bm) return rpsPick(a, b, a, "");
+function resolveRps(a, b, am, bm, tieCount = 0) {
+  if (am === bm) {
+    const nextTie = tieCount + 1;
+    if (nextTie >= 6) return coinFlip(a, b);
+    return rpsPick(a, b, a, "", nextTie);
+  }
   const aw = (am === "Πέτρα" && bm === "Ψαλίδι") || (am === "Ψαλίδι" && bm === "Χαρτί") || (am === "Χαρτί" && bm === "Πέτρα");
   confirmOut(aw ? b : a, "Έχασε στο Πέτρα Ψαλίδι Χαρτί");
 }
@@ -828,9 +846,10 @@ function rpsChoices(onPick) {
   return wrap;
 }
 
-function startTicTacToe(a, b, starting = 1) {
+function startTicTacToe(a, b, starting = 1, tieCount = 0) {
   state.ttt = Array(9).fill(0);
   state.tttTurn = starting;
+  state.tttTieCount = tieCount;
   showTicTacToe(a, b);
 }
 
@@ -838,6 +857,7 @@ function showTicTacToe(a, b) {
   const turn = state.tttTurn === 1 ? a : b;
   const content = render("ΤΡΙΛΙΖΑ", `${turn.name} παίζει`);
   content.append(paragraph(`${a.name} = X | ${b.name} = O`));
+  if (state.tttTieCount) content.append(paragraph(`Ισοπαλίες: ${state.tttTieCount} / 6. Στις 6 πάμε σε κορώνα ή γράμματα.`));
   const board = el("div", "ttt");
   state.ttt.forEach((v, i) => {
     const cell = button(v === 1 ? "X" : v === 2 ? "O" : "", "cell", () => {
@@ -846,7 +866,11 @@ function showTicTacToe(a, b) {
       const winner = tttWinner();
       if (winner === 1) confirmOut(b, "Έχασε στην Τρίλιζα");
       else if (winner === 2) confirmOut(a, "Έχασε στην Τρίλιζα");
-      else if (state.ttt.every(Boolean)) startTicTacToe(a, b, state.tttTurn === 1 ? 2 : 1);
+      else if (state.ttt.every(Boolean)) {
+        const nextTie = state.tttTieCount + 1;
+        if (nextTie >= 6) coinFlip(a, b);
+        else startTicTacToe(a, b, state.tttTurn === 1 ? 2 : 1, nextTie);
+      }
       else { state.tttTurn = state.tttTurn === 1 ? 2 : 1; showTicTacToe(a, b); }
     });
     board.append(cell);
@@ -946,20 +970,26 @@ function finaleRound(a, b, as, bs, match) {
   content.append(actions(button(`Παίξε ${test}`, "", () => match === 1 ? finaleRpsPick(a, b, a, "", as, bs, match) : startFinaleTicTacToe(a, b, as, bs, match, 1))));
 }
 
-function finaleRpsPick(a, b, picker, first, as, bs, match) {
+function finaleRpsPick(a, b, picker, first, as, bs, match, tieCount = 0) {
   const content = render("ΤΕΛΙΚΟΣ RPS", picker.name);
-  content.append(rpsChoices(move => picker === a ? finaleRpsPick(a, b, b, move, as, bs, match) : resolveFinaleRps(a, b, first, move, as, bs, match)));
+  if (tieCount) content.append(paragraph(`Ισοπαλίες: ${tieCount} / 6. Στις 6 πάμε σε κορώνα ή γράμματα.`));
+  content.append(rpsChoices(move => picker === a ? finaleRpsPick(a, b, b, move, as, bs, match, tieCount) : resolveFinaleRps(a, b, first, move, as, bs, match, tieCount)));
 }
 
-function resolveFinaleRps(a, b, am, bm, as, bs, match) {
-  if (am === bm) return finaleRpsPick(a, b, a, "", as, bs, match);
+function resolveFinaleRps(a, b, am, bm, as, bs, match, tieCount = 0) {
+  if (am === bm) {
+    const nextTie = tieCount + 1;
+    if (nextTie >= 6) return finaleCoinFlip(a, b, as, bs, match);
+    return finaleRpsPick(a, b, a, "", as, bs, match, nextTie);
+  }
   const aw = (am === "Πέτρα" && bm === "Ψαλίδι") || (am === "Ψαλίδι" && bm === "Χαρτί") || (am === "Χαρτί" && bm === "Πέτρα");
   finaleRound(a, b, aw ? as + 1 : as, aw ? bs : bs + 1, match + 1);
 }
 
-function startFinaleTicTacToe(a, b, as, bs, match, starting = 1) {
+function startFinaleTicTacToe(a, b, as, bs, match, starting = 1, tieCount = 0) {
   state.ttt = Array(9).fill(0);
   state.tttTurn = starting;
+  state.tttTieCount = tieCount;
   showFinaleTicTacToe(a, b, as, bs, match);
 }
 
@@ -967,6 +997,7 @@ function showFinaleTicTacToe(a, b, as, bs, match) {
   const turn = state.tttTurn === 1 ? a : b;
   const content = render("ΤΕΛΙΚΟΣ ΤΡΙΛΙΖΑ", `${turn.name} παίζει`);
   content.append(paragraph(`${a.name} = X | ${b.name} = O`));
+  if (state.tttTieCount) content.append(paragraph(`Ισοπαλίες: ${state.tttTieCount} / 6. Στις 6 πάμε σε κορώνα ή γράμματα.`));
   const board = el("div", "ttt");
   state.ttt.forEach((v, i) => board.append(button(v === 1 ? "X" : v === 2 ? "O" : "", "cell", () => {
     if (state.ttt[i]) return;
@@ -974,10 +1005,39 @@ function showFinaleTicTacToe(a, b, as, bs, match) {
     const winner = tttWinner();
     if (winner === 1) finaleRound(a, b, as + 1, bs, match + 1);
     else if (winner === 2) finaleRound(a, b, as, bs + 1, match + 1);
-    else if (state.ttt.every(Boolean)) startFinaleTicTacToe(a, b, as, bs, match, state.tttTurn === 1 ? 2 : 1);
+    else if (state.ttt.every(Boolean)) {
+      const nextTie = state.tttTieCount + 1;
+      if (nextTie >= 6) finaleCoinFlip(a, b, as, bs, match);
+      else startFinaleTicTacToe(a, b, as, bs, match, state.tttTurn === 1 ? 2 : 1, nextTie);
+    }
     else { state.tttTurn = state.tttTurn === 1 ? 2 : 1; showFinaleTicTacToe(a, b, as, bs, match); }
   })));
   content.append(board);
+}
+
+function finaleCoinFlip(a, b, as, bs, match) {
+  const content = render("ΚΟΡΩΝΑ ΓΡΑΜΜΑΤΑ", "Ισοπαλία x6");
+  content.append(paragraph(`${a.name}, διάλεξε πλευρά. Το coin flip αποφασίζει τον πόντο αυτού του παιχνιδιού.`));
+  content.append(actions(
+    button("Κορώνα", "", () => finaleCoinFlipSpin(a, b, as, bs, match, "ΚΟΡΩΝΑ")),
+    button("Γράμματα", "secondary", () => finaleCoinFlipSpin(a, b, as, bs, match, "ΓΡΑΜΜΑΤΑ"))
+  ));
+}
+
+function finaleCoinFlipSpin(a, b, as, bs, match, aPick) {
+  const result = Math.random() < .5 ? "ΚΟΡΩΝΑ" : "ΓΡΑΜΜΑΤΑ";
+  const winner = result === aPick ? a : b;
+  const content = render("ΚΟΡΩΝΑ ΓΡΑΜΜΑΤΑ", "Ρίψη");
+  const coin = el("div", "coin", "?");
+  content.append(coin, actions(button("Ρίξε το νόμισμα", "", e => {
+    const flipButton = e.currentTarget;
+    flipButton.disabled = true;
+    coin.classList.add("flip");
+    setTimeout(() => {
+      coin.textContent = result;
+      flipButton.replaceWith(button(`${winner.name} παίρνει πόντο`, "", () => finaleRound(a, b, winner === a ? as + 1 : as, winner === b ? bs + 1 : bs, match + 1)));
+    }, 950);
+  })));
 }
 
 function finaleJuryVote(a, b) {
