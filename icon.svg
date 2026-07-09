@@ -1,9 +1,35 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#100a17"/>
-  <circle cx="256" cy="250" r="152" fill="#22182d" stroke="#ff7eb6" stroke-width="18"/>
-  <path d="M256 116c74 0 124 56 124 128 0 88-62 152-124 152s-124-64-124-152c0-72 50-128 124-128Z" fill="#fdf4ff"/>
-  <circle cx="210" cy="242" r="21" fill="#100a17"/>
-  <circle cx="302" cy="242" r="21" fill="#100a17"/>
-  <path d="M220 318c22 18 50 18 72 0" fill="none" stroke="#100a17" stroke-width="18" stroke-linecap="round"/>
-  <path d="M150 108 110 68M362 108l40-40M256 92V42" stroke="#b190ff" stroke-width="18" stroke-linecap="round"/>
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="72%">
+      <stop offset="0" stop-color="#271a34"/>
+      <stop offset="0.58" stop-color="#100a17"/>
+      <stop offset="1" stop-color="#07060b"/>
+    </radialGradient>
+    <linearGradient id="box" x1="120" y1="148" x2="392" y2="388" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffcf60"/>
+      <stop offset="0.48" stop-color="#b96cff"/>
+      <stop offset="1" stop-color="#ed2d4e"/>
+    </linearGradient>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="1 0 0 0 1  0 1 0 0 .55  0 0 1 0 .85  0 0 0 .8 0"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M126 174 256 104l130 70-130 74Z" fill="#2a2036" stroke="url(#box)" stroke-width="16" stroke-linejoin="round" filter="url(#glow)"/>
+  <path d="M126 174v150l130 84V248Z" fill="#15101f" stroke="#ffc84a" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M386 174v150l-130 84V248Z" fill="#1d1328" stroke="#ed2d4e" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M126 174 256 248l130-74" fill="none" stroke="#a46fff" stroke-width="10" stroke-linejoin="round"/>
+  <circle cx="204" cy="292" r="31" fill="#fff6ff"/>
+  <circle cx="286" cy="298" r="36" fill="#fff6ff"/>
+  <circle cx="242" cy="344" r="24" fill="#fff6ff"/>
+  <circle cx="198" cy="287" r="9" fill="#100a17"/>
+  <circle cx="292" cy="293" r="10" fill="#100a17"/>
+  <circle cx="238" cy="340" r="7" fill="#100a17"/>
+  <path d="M178 250c-28-30-10-62 24-58M306 248c42-26 61 13 36 42M234 214c9-44 52-44 62-6" fill="none" stroke="#70e6ac" stroke-width="12" stroke-linecap="round"/>
+  <path d="M168 362c44 34 130 42 184-10" fill="none" stroke="#ffc84a" stroke-width="12" stroke-linecap="round" opacity=".85"/>
 </svg>
