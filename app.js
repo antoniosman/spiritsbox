@@ -29,6 +29,123 @@ const roster = [
   ["Zoe", "char_zoe.jpeg"]
 ].map(([name, file]) => ({ id: name.toLowerCase(), name, file, alive: true, ally: null, allyUntilRound: 0 }));
 
+const speechNames = {
+  Alex: "AH-lex",
+  Billy: "BEE-lee",
+  Elisa: "eh-LEE-so Lant-SAH-va",
+  Evaggelia: "eh-van-gheh-LEE-ah",
+  Evelyn: "EH-veh-lin",
+  Jasmine: "Yas-MEEN",
+  Rino: "REE-no",
+  Sargenie: "sar-JEE-nee",
+  Smaragda: "sma-ragh-DEN-yah",
+  Sorina: "so-REE-nah",
+  Zoe: "zo-EE"
+};
+
+const QUIZ_BANK = [
+  ["Ποιο είναι μεγαλύτερο;", "Ήλιος", "Φεγγάρι", 0],
+  ["2 + 3 = ?", "5", "6", 0],
+  ["Οι Android εφαρμογές έχουν APK;", "Ναι", "Όχι", 0],
+  ["Τι έρχεται πρώτο στο αλφάβητο;", "Α", "Ζ", 0],
+  ["Η φωτιά είναι συνήθως...", "Ζεστή", "Κρύα", 0],
+  ["Πόσες πλευρές έχει ένα τρίγωνο;", "3", "4", 0],
+  ["Πόσες μέρες έχει μία εβδομάδα;", "7", "8", 0],
+  ["Ποιο είναι πιο κρύο;", "Πάγος", "Λάβα", 0],
+  ["Ποιο χρώμα βγαίνει από κόκκινο και μπλε;", "Μωβ", "Πράσινο", 0],
+  ["Πόσο κάνει 9 - 4;", "5", "6", 0],
+  ["Ποιο όργανο δείχνει την ώρα;", "Ρολόι", "Θερμόμετρο", 0],
+  ["Ποια εποχή έχει συνήθως περισσότερο κρύο;", "Χειμώνας", "Καλοκαίρι", 0],
+  ["Πόσα λεπτά έχει μία ώρα;", "60", "100", 0],
+  ["Ποιο είναι φρούτο;", "Μήλο", "Πατάτα", 0],
+  ["Ποιο ζει στη θάλασσα;", "Ψάρι", "Αετός", 0],
+  ["Ποιο είναι πιο κοντά στη Γη;", "Σελήνη", "Ήλιος", 0],
+  ["Ποιο γράμμα έρχεται μετά το Β;", "Γ", "Δ", 0],
+  ["Πόσα μάτια έχει συνήθως ένας άνθρωπος;", "2", "3", 0],
+  ["Τι χρώμα έχει συνήθως το γρασίδι;", "Πράσινο", "Κόκκινο", 0],
+  ["Ποιο είναι πιο γρήγορο;", "Αεροπλάνο", "Ποδήλατο", 0],
+  ["Πόσο κάνει 4 x 3;", "12", "10", 0],
+  ["Ποιο είναι μέταλλο;", "Χρυσός", "Ξύλο", 0],
+  ["Ποιο είναι πλανήτης;", "Άρης", "Άτλας", 0],
+  ["Ποιο χρειάζεται για να ανάψει φωτιά;", "Οξυγόνο", "Πάγος", 0],
+  ["Πόσα δάχτυλα έχει συνήθως ένα χέρι;", "5", "6", 0],
+  ["Ποιο είναι πιο βαρύ;", "Πέτρα", "Φτερό", 0],
+  ["Ποια λέξη σημαίνει νερό στα αγγλικά;", "Water", "Fire", 0],
+  ["Ποιο ζώο νιαουρίζει;", "Γάτα", "Σκύλος", 0],
+  ["Ποιο ζώο γαβγίζει;", "Σκύλος", "Γάτα", 0],
+  ["Πόσο κάνει 15 + 5;", "20", "25", 0],
+  ["Ποια συσκευή βγάζει φωτογραφίες;", "Κάμερα", "Τοστιέρα", 0],
+  ["Ποιο είναι πιο γλυκό;", "Μέλι", "Αλάτι", 0],
+  ["Ποιο βρίσκεται στον ουρανό τη νύχτα;", "Αστέρια", "Ρίζες", 0],
+  ["Πόσοι μήνες έχει ένας χρόνος;", "12", "10", 0],
+  ["Ποια ημέρα έρχεται μετά τη Δευτέρα;", "Τρίτη", "Παρασκευή", 0],
+  ["Ποιο είναι όχημα;", "Αυτοκίνητο", "Καρέκλα", 0],
+  ["Ποιο είναι πιο μαλακό;", "Μαξιλάρι", "Τούβλο", 0],
+  ["Ποιο ποτό φτιάχνεται από σταφύλια;", "Κρασί", "Καφές", 0],
+  ["Πόσο κάνει 100 - 1;", "99", "90", 0],
+  ["Ποιο είναι μουσικό όργανο;", "Πιάνο", "Τραπέζι", 0],
+  ["Ποιο είναι έντομο;", "Μέλισσα", "Άλογο", 0],
+  ["Ποια λέξη είναι χρώμα;", "Μπλε", "Τρέχω", 0],
+  ["Πόσα πόδια έχει μια καρέκλα συνήθως;", "4", "5", 0],
+  ["Ποιο είναι πιο φωτεινό;", "Λάμπα", "Σκιά", 0],
+  ["Ποιο είναι πρωτεύουσα της Ελλάδας;", "Αθήνα", "Πάτρα", 0],
+  ["Ποιο γράμμα είναι φωνήεν;", "Α", "Π", 0],
+  ["Ποια θάλασσα βρίσκεται δίπλα στην Ελλάδα;", "Αιγαίο", "Βαλτική", 0],
+  ["Πόσο κάνει 7 + 8;", "15", "14", 0],
+  ["Ποιο είναι εργαλείο κοπής;", "Ψαλίδι", "Ποτήρι", 0],
+  ["Ποιο είναι πιο ζεστό;", "Ήλιος", "Χιόνι", 0],
+  ["Ποιο τρώμε σαν πρωινό;", "Δημητριακά", "Πέτρες", 0],
+  ["Ποια συσκευή παίρνει τηλέφωνο;", "Κινητό", "Βιβλίο", 0],
+  ["Ποιο είναι λαχανικό;", "Καρότο", "Κεράσι", 0],
+  ["Πόσες ώρες έχει μία ημέρα;", "24", "12", 0],
+  ["Ποιο είναι πιο ψηλό;", "Βουνό", "Παπούτσι", 0],
+  ["Ποιο πετάει;", "Πουλί", "Ψάρι", 0],
+  ["Ποια λέξη σημαίνει φως στα αγγλικά;", "Light", "Night", 0],
+  ["Ποιο είναι παιχνίδι με μπάλα;", "Ποδόσφαιρο", "Σκάκι", 0],
+  ["Πόσο κάνει 6 x 6;", "36", "30", 0],
+  ["Ποιο έχει κλειδιά;", "Πιάνο", "Πιάτο", 0],
+  ["Ποιο είναι γαλακτοκομικό;", "Τυρί", "Ρύζι", 0],
+  ["Ποιο είναι φυσικό φαινόμενο;", "Βροχή", "Τηλεόραση", 0],
+  ["Πόσες εποχές έχει ένας χρόνος;", "4", "5", 0],
+  ["Ποιο είναι πιο μικρό;", "Μυρμήγκι", "Ελέφαντας", 0],
+  ["Ποια λέξη σημαίνει σπίτι στα αγγλικά;", "House", "Horse", 0],
+  ["Ποιο είναι σχήμα;", "Κύκλος", "Μουσική", 0],
+  ["Ποιο είναι πιο αλμυρό;", "Θάλασσα", "Πηγή", 0],
+  ["Πόσο κάνει 18 / 3;", "6", "9", 0],
+  ["Ποιο είναι δέντρο;", "Ελιά", "Πέτρα", 0],
+  ["Ποιο έχει οθόνη;", "Tablet", "Κουτάλι", 0],
+  ["Ποιο είναι άθλημα;", "Μπάσκετ", "Ζωγραφική", 0],
+  ["Ποιο είναι πιο γρήγορο στο νερό;", "Βάρκα", "Καμήλα", 0],
+  ["Ποιο είναι αντικείμενο γραφής;", "Μολύβι", "Πιάτο", 0],
+  ["Πόσο κάνει 11 + 11;", "22", "21", 0],
+  ["Ποιο είναι πιο σκοτεινό;", "Νύχτα", "Μεσημέρι", 0],
+  ["Ποιο ζώο έχει προβοσκίδα;", "Ελέφαντας", "Λύκος", 0],
+  ["Ποιο είναι πιο ξινό;", "Λεμόνι", "Σοκολάτα", 0],
+  ["Πόσα χρώματα έχει συνήθως το ουράνιο τόξο;", "7", "5", 0],
+  ["Ποιο είναι χώρα;", "Ιταλία", "Παρίσι", 0],
+  ["Ποιο είναι πόλη;", "Λονδίνο", "Ευρώπη", 0],
+  ["Ποιο είναι πιο κοντά στο μηδέν;", "1", "10", 0],
+  ["Ποιο χρησιμοποιείς για να κόψεις χαρτί;", "Ψαλίδι", "Πιρούνι", 0],
+  ["Ποιο είναι γλυκό;", "Παγωτό", "Πιπέρι", 0],
+  ["Πόσο κάνει 8 x 2;", "16", "18", 0],
+  ["Ποιο είναι πιο πιθανό να βρεις σε βιβλίο;", "Σελίδες", "Ρόδες", 0],
+  ["Ποιο είναι ηλεκτρική συσκευή;", "Ψυγείο", "Μολύβι", 0],
+  ["Ποιο ζώο κάνει μέλι;", "Μέλισσα", "Πεταλούδα", 0],
+  ["Ποιο είναι πιο μεγάλο;", "Φάλαινα", "Ποντίκι", 0],
+  ["Ποιο είναι υγρό;", "Νερό", "Άμμος", 0],
+  ["Πόσο κάνει 20 / 4;", "5", "4", 0],
+  ["Ποιο είναι πιο εύθραυστο;", "Γυαλί", "Σίδερο", 0],
+  ["Ποιο είναι κοσμικό σώμα;", "Αστέρι", "Ποτάμι", 0],
+  ["Ποιο είναι μέρος υπολογιστή;", "Πληκτρολόγιο", "Τηγάνι", 0],
+  ["Ποιο είναι πιο αργό;", "Χελώνα", "Τρένο", 0],
+  ["Πόσο κάνει 13 + 7;", "20", "19", 0],
+  ["Ποιο είναι μέσο μεταφοράς;", "Λεωφορείο", "Καναπές", 0],
+  ["Ποιο είναι πιο βαρύ συνήθως;", "Καρπούζι", "Σταφύλι", 0],
+  ["Ποια λέξη σημαίνει νύχτα στα αγγλικά;", "Night", "Light", 0],
+  ["Ποιο είναι πιο κατάλληλο για βροχή;", "Ομπρέλα", "Γυαλιά ηλίου", 0],
+  ["Πόσο κάνει 5 x 5;", "25", "20", 0]
+];
+
 const state = {
   count: 8,
   selected: [],
@@ -49,6 +166,7 @@ const state = {
   quizIndex: 0,
   quizA: 0,
   quizB: 0,
+  quizDeck: [],
   tttTieCount: 0
 };
 
@@ -106,24 +224,30 @@ function speak(text) {
   window.speechSynthesis.speak(utter);
 }
 
+function applyNamePronunciations(text) {
+  return Object.entries(speechNames).reduce(
+    (value, [name, spoken]) => value.replace(new RegExp(`\\b${name}\\b`, "g"), spoken),
+    String(text || "")
+  );
+}
+
 function toEnglishSpeech(text) {
   const value = String(text || "");
-  if (/^[\x00-\x7F\s.,!?:;'’&()\-]+$/.test(value)) return value;
+  if (/^[\x00-\x7F\s.,!?:;'’&()\-]+$/.test(value)) return applyNamePronunciations(value);
   const names = roster.map(p => p.name).join("|");
   const namePattern = new RegExp(`(${names})`);
   const foundName = value.match(namePattern)?.[1] || "";
-  if (value.includes("κινδυνεύει")) return `${foundName || "Player"} selected for elimination.`;
-  if (value.includes("έφυγε")) return `${foundName || "Player"} eliminated.`;
+  const spokenName = applyNamePronunciations(foundName || "Player");
+  if (value.includes("κινδυνεύει")) return `${spokenName} selected for elimination.`;
+  if (value.includes("έφυγε")) return `${spokenName} eliminated.`;
   if (value.includes("φορτώνει")) return "Spirits Box is loading.";
   if (value.includes("Καλώς")) return "Welcome to Spirits Box.";
-  if (value.includes("Ενεργός παίκτης")) return `Active player, ${foundName}.`;
-  if (value.includes("Ο τροχός διάλεξε")) return `The wheel selected ${foundName}.`;
-  if (value.includes("κινδυνεύει")) return `${foundName || "Player"} selected for elimination.`;
-  if (value.includes("έφυγε")) return `${foundName} has been eliminated.`;
-  if (value.includes("Βγήκε")) return value.replace("Βγήκε", "Result").replace("χάνει", "loses");
-  if (value.includes("κέρδισε") || value.includes("κερδίζει")) return value.replace("κέρδισε", "won").replace("κερδίζει", "wins");
-  if (value.includes("χάνει")) return value.replace("χάνει", "loses");
-  if (value.includes("δένει") || value.includes("δέθηκαν")) return value.replace("και", "and").replace("δέθηκαν για τέσσερις γύρους", "are bound for four rounds");
+  if (value.includes("Ενεργός παίκτης")) return `Active player, ${spokenName}.`;
+  if (value.includes("Ο τροχός διάλεξε")) return `The wheel selected ${spokenName}.`;
+  if (value.includes("Βγήκε")) return applyNamePronunciations(value.replace("Βγήκε", "Result").replace("χάνει", "loses"));
+  if (value.includes("κέρδισε") || value.includes("κερδίζει")) return applyNamePronunciations(value.replace("κέρδισε", "won").replace("κερδίζει", "wins"));
+  if (value.includes("χάνει")) return applyNamePronunciations(value.replace("χάνει", "loses"));
+  if (value.includes("δένει") || value.includes("δέθηκαν")) return applyNamePronunciations(value.replace("και", "and").replace("δέθηκαν για τέσσερις γύρους", "are bound for four rounds"));
   if (value.includes("Καυτή Πατάτα")) return "Hot Potato.";
   if (value.includes("Πάτα το Κουμπί")) return "Press the Button.";
   if (value.includes("Τροχός")) return "The wheel is spinning.";
@@ -131,7 +255,7 @@ function toEnglishSpeech(text) {
   if (value.includes("ΜΟΝΟΜΑΧΙΑ")) return "Duel card.";
   if (value.includes("ΧΑΟΣ")) return "Chaos card.";
   if (value.includes("ΒΟΜΒΑ")) return "Bomb card.";
-  return value
+  return applyNamePronunciations(value
     .replaceAll("Πέτρα", "Rock")
     .replaceAll("Ψαλίδι", "Scissors")
     .replaceAll("Χαρτί", "Paper")
@@ -152,7 +276,7 @@ function toEnglishSpeech(text) {
     .replaceAll("Ψηφοφορία", "Voting")
     .replaceAll("Μονομαχία", "Duel")
     .replaceAll("Αποχώρηση", "Elimination")
-    .replaceAll("Νικητής", "Winner");
+    .replaceAll("Νικητής", "Winner"));
 }
 
 function render(kicker, title, body) {
@@ -392,7 +516,7 @@ function card(type, title, body, action) {
 }
 
 function duelCard() {
-  const game = sample(["Πέτρα Ψαλίδι Χαρτί", "Τρίλιζα", "Κορώνα Γράμματα", "Μνήμη", "5 Ερωτήσεις"]);
+  const game = sample(["Πέτρα Ψαλίδι Χαρτί", "Τρίλιζα", "Κορώνα Γράμματα", "Μνήμη", "6 Ερωτήσεις"]);
   return card("ΜΟΝΟΜΑΧΙΑ", game, "Διάλεξε αντίπαλο. Το mini game παίζεται μέσα στην εφαρμογή.", () => chooseTarget("Αντίπαλος", candidatesExcept(state.active), p => startMini(game, state.active, p)));
 }
 
@@ -810,7 +934,7 @@ function sacrifice() {
 function startMini(game, a, b) {
   if (game.includes("Τρίλιζα")) startTicTacToe(a, b, 1);
   else if (game.includes("Μνήμη")) startMemory(a, b);
-  else if (game.includes("5")) startQuiz(a, b);
+  else if (game.includes("Ερωτήσεις")) startQuiz(a, b);
   else if (game.includes("Κορώνα")) coinFlip(a, b);
   else rpsPick(a, b, a, "");
 }
@@ -912,21 +1036,38 @@ function memoryInput(a, b, p) {
 }
 
 function startQuiz(a, b) {
-  state.quizIndex = 0; state.quizA = 0; state.quizB = 0; quiz(a, b);
+  state.quizIndex = 0;
+  state.quizA = 0;
+  state.quizB = 0;
+  state.quizDeck = shuffle(QUIZ_BANK).slice(0, 6).map(item => {
+    const answers = shuffle([
+      { text: item[1], correct: item[3] === 0 },
+      { text: item[2], correct: item[3] === 1 }
+    ]);
+    return { question: item[0], answers };
+  });
+  quiz(a, b);
 }
 
 function quiz(a, b) {
-  const q = [["Ποιο είναι μεγαλύτερο;", "Ήλιος", "Φεγγάρι", 0], ["2 + 3 = ?", "5", "6", 0], ["Οι Android εφαρμογές έχουν APK;", "Ναι", "Όχι", 0], ["Τι έρχεται πρώτο;", "Α", "Ζ", 0], ["Η φωτιά είναι συνήθως...", "Ζεστή", "Κρύα", 0]];
-  if (state.quizIndex >= q.length) return state.quizA === state.quizB ? coinFlip(a, b) : confirmOut(state.quizA < state.quizB ? a : b, "Έχασε στις 5 Ερωτήσεις");
+  if (state.quizIndex >= state.quizDeck.length) return state.quizA === state.quizB ? coinFlip(a, b) : confirmOut(state.quizA < state.quizB ? a : b, "Έχασε στις 6 Ερωτήσεις");
   const answerer = state.quizIndex % 2 === 0 ? a : b;
-  const item = q[state.quizIndex];
-  const content = render("5 ΕΡΩΤΗΣΕΙΣ", answerer.name);
-  content.append(el("div", "panel", `Σκορ: ${a.name} ${state.quizA} - ${state.quizB} ${b.name}`), paragraph(item[0]));
-  [1,2].forEach(i => content.append(button(item[i], "secondary", () => {
-    if (i - 1 === item[3]) answerer === a ? state.quizA++ : state.quizB++;
+  const item = state.quizDeck[state.quizIndex];
+  const content = render("6 ΕΡΩΤΗΣΕΙΣ", answerer.name);
+  const quizPanel = el("div", "quiz-panel");
+  quizPanel.append(
+    el("div", "quiz-score", `<strong>${a.name}</strong><span>${state.quizA}</span><b>VS</b><span>${state.quizB}</span><strong>${b.name}</strong>`),
+    el("div", "quiz-progress", `Ερώτηση ${state.quizIndex + 1} / ${state.quizDeck.length}`),
+    el("div", "quiz-question", item.question)
+  );
+  const options = el("div", "quiz-options");
+  item.answers.forEach(answer => options.append(button(answer.text, "secondary quiz-choice", () => {
+    if (answer.correct) answerer === a ? state.quizA++ : state.quizB++;
     state.quizIndex++;
     quiz(a, b);
   })));
+  quizPanel.append(options);
+  content.append(quizPanel);
 }
 
 function coinFlip(a, b) {
