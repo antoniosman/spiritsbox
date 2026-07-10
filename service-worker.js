@@ -1,4 +1,4 @@
-const CACHE = "spirits-box-pwa-v11";
+const CACHE = "spirits-box-pwa-v12";
 const CORE = [
   "./",
   "./index.html",

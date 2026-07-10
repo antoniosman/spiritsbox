@@ -30,17 +30,17 @@ const roster = [
 ].map(([name, file]) => ({ id: name.toLowerCase(), name, file, alive: true, ally: null, allyUntilRound: 0 }));
 
 const speechNames = {
-  Alex: "AH-lex",
-  Billy: "BEE-lee",
-  Elisa: "eh-LEE-so Lant-SAH-va",
-  Evaggelia: "eh-van-gheh-LEE-ah",
-  Evelyn: "EH-veh-lin",
-  Jasmine: "Yas-MEEN",
-  Rino: "REE-no",
-  Sargenie: "sar-JEE-nee",
-  Smaragda: "sma-ragh-DEN-yah",
-  Sorina: "so-REE-nah",
-  Zoe: "zo-EE"
+  Alex: "Ahlex",
+  Billy: "Beely",
+  Elisa: "Elisso Lantsava",
+  Evaggelia: "Evanghelia",
+  Evelyn: "Evelin",
+  Jasmine: "Yasmeen",
+  Rino: "Reeno",
+  Sargenie: "Sarjeeny",
+  Smaragda: "Smaragdenia",
+  Sorina: "Soreena",
+  Zoe: "Zoey"
 };
 
 const QUIZ_BANK = [
